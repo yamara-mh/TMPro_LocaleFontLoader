@@ -4,7 +4,7 @@
 必要な言語のテクスチャだけを読み込み、文字メッシュの動的生成数を減らせます。
 全ての TMP_FontAsset や Font を Remote に置くことも実質可能です（多分）。
 
-参考ブログ：[本当に使える！TextMeshProでの「日本語」「多言語」対応方法](https://blog.kyubuns.dev/entry/2021/02/06/001609)
+参考にさせていただいたブログ：[きゅぶろぐ　TextMeshProカテゴリ](https://blog.kyubuns.dev/archive/category/TextMeshPro)
 
 # 使い方
 
@@ -15,25 +15,26 @@ Package Manager の```Add package from git URL```に下記のURLを入力して�
 // TODO
 ```
 
-また Dynamic な TMPro フォントはテクスチャが勝手に書き変わり Git と相性が悪いです。
-**下記のような対策できるパッケージもインポートしてください。**
+また Dynamic な TMPro フォントはテクスチャが勝手に書き変わるため Git と相性が悪いです。
+**下記のような対策パッケージのインポートを推奨します。**
 
 https://github.com/STARasGAMES/tmpro-dynamic-data-cleaner.git#upm
 
 ## ファイルの生成と設定
 
-Resources 上で```Create -> ScriptableObject -> LocaleFontLoader```を選択します。
+Resources 上で```Create -> ScriptableObject -> LocaleFontLoader```を選択すると、下記の ScriptableObject が生成されます。
 
-![image](https://github.com/yamara-mh/FallbackFontLoader/assets/39893033/d8e5eea1-b082-45d3-b71f-a1fa0784edad)
+![image](https://github.com/yamara-mh/TMPro_LocaleFontLoader/assets/39893033/eb1ab188-0373-41fc-affd-8d288af5b7a4)
 
 RootEmptyFont に 下記のような TMP_FontAsset を用意して設定します。
 - Source Font File : None
+- Atlas Population Mode : Static
 - Atlas Resolution : 8 x 8
 - Character Set : Unicode Range(Hex) & 何も指定しない
 
 どの言語でも利用する Static な TMP_FontAsset を用意して```Common Static Font Refs```に設定します。
 - Atlas Population Mode : Static
-- Character Set : Extended ASCII or ASCII
+- Character Set : Extended ASCII
 
 どの言語でも利用する Dynamic な TMP_FontAsset を用意して```Common Dynamic Font Refs```に設定します。
 - Atlas Population Mode : Dynamic
@@ -41,17 +42,31 @@ RootEmptyFont に 下記のような TMP_FontAsset を用意して設定しま�
 
 対応言語ごとに TMP_FontAsset を用意して```Locale Fonts```に設定します。
 - Atlas Population Mode : Static
-- Character Set : Unicode Range(Hex) & 頻出文字群 ([日本語の例](https://gist.github.com/kyubuns/b06b84106a6b6791f6f4b194c98e42fd))
+- Character Set : Unicode Range(Hex) & 頻出文字群 ([日本語の例](https://gist.github.com/oktopus1959/272c960ccfe03453bb975d1e994cb99d))
+
+
+
+|項目|型|説明|
+|-|-|-|
+|RootEmptyFont|TMP_FontAsset|文字を登録しない TMP_FontAssets を設定します。動的フォントを Fallback に設定すると、編集中にテキストを表示する場合に便利です。ビルド時に Fallback は LocaleFontLoader_FallbackRemoverEditor によって一時的に空になります。そのためローカルと Addressable で二重に保存される心配はありません。|
+|LoadOnInit|bool|起動時(```RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)```)に Fallback を読み込む処理を追加します。特定の場面でのみ使うフォントなら無効でも良さそうです。|
+|ReloadOnLocaleChanged|bool|言語切替時(```LocalizationSettings.SelectedLocaleChanged```)に Fallback を読み込む処理を追加します。特定の場面でのみ使うフォントなら無効でも良さそうです。|
+|UpdateAllTextOnLoaded|bool|Fallback の読み込み完了時にシーン上の TextMeshPro を取得し、RootEmptyFont が使われていたら ForceMeshUpdate() します。この処理は Localization Table が先に反映されてもフォントを更新可能にするためにあります。言語切替後に再起動する仕様等であれば無効でも良さそうです。|
+|CommonStaticFontRef|AssetReferenceT<br><TMP_FontAsset>|全ての言語で共通して使う Static な TMP_FontAsset を設定します。一般的に Extended ASCII のみを収録した TMP_FontAsset を設定します。|
+|CommonDynamicFontRef|AssetReferenceT<br><TMP_FontAsset>|多言語フォントを使った Dynamic な TMP_FontAsset を設定します。|
+|LocaleFonts|||
 
 ### 備考
 
-```()_``` が含まれない TMP_FontAsset を使うと次の警告が出ます。
+RootEmptyFont には文字を登録しないため、次の警告が出ます。
 ```The character used for Underline is not available in font asset ...```
-この警告は```TMP Settings```の```Dynamic Font System Settings -> Disable warnings```を有効にして抑制できます。
+この警告は```()_``` が含まれない TMP_FontAsset を使うと出るようです。
+```TMP Settings```の```Dynamic Font System Settings -> Disable warnings```を有効にして抑制できます。
 
-Sampling Point Size と Padding の比率が違うほどアウトラインの太さに違いが出るので、各パラメータを調整して妥協点を見つけてください。
+Sampling Point Size と Padding の比率が違うほどアウトラインの太さに違いが出るので、収録文字や各パラメータを調整して妥協点を見つけてください。
 
-Extended ASCII には英数字と基本的な記号に加え、アクセント記号や特殊記号が含まれています。ゲームによっては ASCII を選択したり一部文字を減らしても良さそうです。
+[Localization Tables で使われた文字の一覧を言語ごとに出力する事が可能です。](https://docs.unity.cn/Packages/com.unity.localization@1.0/manual/StringTables.html)
+
 
 ## 利用
 
