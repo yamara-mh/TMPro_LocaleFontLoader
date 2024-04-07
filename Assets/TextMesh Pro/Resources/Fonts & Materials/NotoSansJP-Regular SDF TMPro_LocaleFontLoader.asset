@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e00abedbcebffba45b05e088dafdda1c, type: 3}
+  m_Name: NotoSansJP-Regular SDF TMPro_LocaleFontLoader
+  m_EditorClassIdentifier: 
+  BaseFont: {fileID: 11400000, guid: e59793eba4063c342bf6bcc8c881a7e3, type: 2}
+  LoadOnInit: 1
+  ReloadOnLocaleChanged: 1
+  UpdateAllTextOnLoaded: 1
+  DynamicFontRef:
+    m_AssetGUID: 47ae920563d02034c89883f3cbb625c5
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  LocaleFonts:
+  - Identifier:
+      m_Code: ja
+    FontRef:
+      m_AssetGUID: 7090a7b224f1a5040bc05ffd3ec4d255
+      m_SubObjectName: 
+      m_SubObjectType: 
+      m_EditorAssetChanged: 0
