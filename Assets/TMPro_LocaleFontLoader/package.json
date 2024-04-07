@@ -10,11 +10,5 @@
         "textmeshpro",
         "tmpro",
         "localization"
-    ],
-    
-    "dependencies": {
-        "com.unity.testmeshpro": "3.0.8",
-        "com.unity.localization": "1.4.5",
-        "com.cysharp.unitask": "2.5.4"
-    }
+    ]
 }
