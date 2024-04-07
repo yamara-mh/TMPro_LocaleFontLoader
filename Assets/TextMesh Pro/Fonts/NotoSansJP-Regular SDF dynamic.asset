@@ -6,7 +6,7 @@ Texture2D:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: NotoSansJP-Regular Atlas
+  m_Name: NotoSansJP-Regular SDF dynamic Atlas
   m_ImageContentsHash:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
@@ -254,9 +254,9 @@ MonoBehaviour:
     packingMode: 0
     atlasWidth: 512
     atlasHeight: 256
-    characterSetSelectionMode: 7
+    characterSetSelectionMode: 6
     characterSequence: 
-    referencedFontAssetGUID: 
+    referencedFontAssetGUID: 47ae920563d02034c89883f3cbb625c5
     referencedTextAssetGUID: 
     fontStyle: 0
     fontStyleModifier: 0

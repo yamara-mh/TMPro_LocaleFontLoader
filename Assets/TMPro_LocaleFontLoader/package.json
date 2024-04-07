@@ -1,8 +1,20 @@
 {
     "name": "com.yamara.tmpro_locale_font_loader",
-    "author": "Yamara",
-    "version": "1.0.0",
     "displayName": "TMpro Locale Font Loader",
     "description": "This is a package that uses Addressables to load the appropriate FallbackFont when starting the game or changing the language.",
-    "unity": "2022.3"
+    "author": "Yamara",
+    "version": "0.0.0",
+    "unity": "2022.3",
+
+    "keywords": [
+        "textmeshpro",
+        "tmpro",
+        "localization"
+    ],
+    
+    "dependencies": {
+        "com.unity.testmeshpro": "3.0.8",
+        "com.unity.localization": "1.4.5",
+        "com.cysharp.unitask": "2.5.4"
+    }
 }

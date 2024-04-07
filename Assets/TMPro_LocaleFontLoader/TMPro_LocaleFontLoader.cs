@@ -9,6 +9,7 @@ using System.Linq;
 using TMPro;
 using System.Threading;
 
+
 namespace Yamara.TMPro
 {
     /// <summary>
@@ -41,12 +42,14 @@ namespace Yamara.TMPro
         {
             public LocaleIdentifier Identifier;
             public AssetReferenceT<TMP_FontAsset> FontRef;
+            public AssetReferenceT<TMP_FontAsset> OverrideDynamicFontRef;
         }
 
 
         private List<AssetReferenceT<TMP_FontAsset>> currentLocaleFontRefs = new();
-        private bool? isLoaded;
-        public bool IsLoaded => isLoaded.HasValue ? isLoaded.Value : false;
+        public bool IsLoading { get; private set; }
+        public bool IsLoaded { get; private set; }
+        public Action OnLoaded;
 
         public static event Action<Locale> OnLoadedAllFonts;
         public static bool IsLoadedFonts { get; private set; }
@@ -56,6 +59,7 @@ namespace Yamara.TMPro
 
 
 #if UNITY_EDITOR
+        private static bool isQuitting = false;
         private static Dictionary<TMPro_LocaleFontLoader, List<TMP_FontAsset>> fallbackFontsEditor = new();
 #endif
 
@@ -89,6 +93,7 @@ namespace Yamara.TMPro
         }
         private static void ApplicationQuittingEditor()
         {
+            isQuitting = true;
             OnLoadedAllFonts = null;
             IsLoadedFonts = false;
             if (fallbackFontsEditor.Count() > 0)
@@ -133,43 +138,76 @@ namespace Yamara.TMPro
             }
         }
 
-        public async UniTask LoadFontsAsync(Locale locale = null, CancellationToken cancellationToken = default, Action onCompleted = null)
+        public async UniTask LoadFontsAsync(Locale locale = null, CancellationToken cancellationToken = default)
         {
-            if (isLoaded == false) return;
-            isLoaded = false;
+            if (IsLoading) return;
+            IsLoading = true;
+            IsLoaded = false;
+
             locale ??= await LocalizationSettings.SelectedLocaleAsync;
             if (cancellationToken.IsCancellationRequested) return;
             BaseFont.fallbackFontAssetTable.Clear();
 
+            var overrideDynamicFontFlag = false;
             var nextLocaleFontRefs = new List<AssetReferenceT<TMP_FontAsset>>();
             foreach (var item in LocaleFonts.Where(l => l.Identifier == locale.Identifier))
             {
-                if (item.FontRef.RuntimeKeyIsValid() == false) continue;
-                if (item.FontRef.Asset == null) await item.FontRef.LoadAssetAsync();
-                if (cancellationToken.IsCancellationRequested) return;
-                if (item.FontRef.Asset != null)
+                if (item.FontRef != null && item.FontRef.RuntimeKeyIsValid())
                 {
-                    BaseFont.fallbackFontAssetTable.Add(item.FontRef.Asset as TMP_FontAsset);
-                    nextLocaleFontRefs.Add(item.FontRef);
+                    if (item.FontRef.Asset == null) await item.FontRef.LoadAssetAsync();
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        UnloadAllFallback();
+                        return;
+                    }
+                    if (item.FontRef.Asset != null)
+                    {
+                        BaseFont.fallbackFontAssetTable.Add(item.FontRef.Asset as TMP_FontAsset);
+                        nextLocaleFontRefs.Add(item.FontRef);
+                    }
+                }
+
+                if (item.OverrideDynamicFontRef != null && item.OverrideDynamicFontRef.RuntimeKeyIsValid())
+                {
+                    if (item.OverrideDynamicFontRef.Asset == null) await item.OverrideDynamicFontRef.LoadAssetAsync();
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        UnloadAllFallback();
+                        return;
+                    }
+                    if (item.OverrideDynamicFontRef.Asset != null)
+                    {
+                        overrideDynamicFontFlag = true;
+                        BaseFont.fallbackFontAssetTable.Add(item.OverrideDynamicFontRef.Asset as TMP_FontAsset);
+                        nextLocaleFontRefs.Add(item.OverrideDynamicFontRef);
+                    }
                 }
             }
 
-            foreach (var releaseFontRef in currentLocaleFontRefs.Except(nextLocaleFontRefs))
+            if (overrideDynamicFontFlag == false)
             {
-                if (releaseFontRef.Asset != null) releaseFontRef.ReleaseAsset();
+                if (DynamicFontRef != null && DynamicFontRef.RuntimeKeyIsValid())
+                {
+                    if (DynamicFontRef.Asset == null) await DynamicFontRef.LoadAssetAsync();
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        UnloadAllFallback();
+                        return;
+                    }
+                    if (DynamicFontRef.Asset != null)
+                    {
+                        BaseFont.fallbackFontAssetTable.Add(DynamicFontRef.Asset as TMP_FontAsset);
+                        nextLocaleFontRefs.Add(DynamicFontRef);
+                    }
+                }
             }
 
+            foreach (var releaseFontRef in currentLocaleFontRefs.Except(nextLocaleFontRefs)) if (releaseFontRef.Asset != null) releaseFontRef.ReleaseAsset();
             currentLocaleFontRefs = nextLocaleFontRefs;
 
-            if (DynamicFontRef.RuntimeKeyIsValid())
-            {
-                if (DynamicFontRef.Asset == null) await DynamicFontRef.LoadAssetAsync();
-                if (cancellationToken.IsCancellationRequested) return;
-                if (DynamicFontRef.Asset != null) BaseFont.fallbackFontAssetTable.Add(DynamicFontRef.Asset as TMP_FontAsset);
-            }
-
-            isLoaded = true;
-            onCompleted?.Invoke();
+            IsLoading = false;
+            IsLoaded = true;
+            OnLoaded?.Invoke();
         }
         public void UpdateTexts()
         {
@@ -180,11 +218,12 @@ namespace Yamara.TMPro
         }
         public void UnloadAllFallback()
         {
-            isLoaded = false;
-
+            IsLoaded = false;
+#if UNITY_EDITOR
+            if (isQuitting) return;
+#endif
             foreach (var fontRef in currentLocaleFontRefs.Where(r => r.Asset != null)) fontRef.ReleaseAsset();
             currentLocaleFontRefs.Clear();
-            if (DynamicFontRef.Asset != null) DynamicFontRef.ReleaseAsset();
 
             BaseFont.fallbackFontAssetTable.Clear();
         }

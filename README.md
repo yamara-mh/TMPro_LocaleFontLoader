@@ -1,3 +1,6 @@
+# 注意
+このパッケージは十分に検証できていません。
+
 # TMPro_LocaleFontLoader
 ゲーム起動時や言語変更時に適切な FallbackFont を Addressables で読み込む Unity の TextMeshPro 用パッケージです。
 必要な言語のテクスチャだけを読み込み、処理負荷が高い文字テクスチャの動的生成頻度を減らせます。
@@ -9,7 +12,7 @@
 ## インポート
 Package Manager の```Add package from git URL```に下記のURLを入力してください。
 ```
-// TODO
+https://github.com/yamara-mh/TMPro_LocaleFontLoader/tree/feature.git?path=Assets/TMPro_LocaleFontLoader
 ```
 
 また Dynamic な TMPro フォントはテクスチャが勝手に書き変わるため Git と相性が悪いです。
