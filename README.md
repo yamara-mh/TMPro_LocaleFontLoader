@@ -8,9 +8,10 @@
 参考にさせていただいたブログ：[きゅぶろぐ　TextMeshProカテゴリ](https://blog.kyubuns.dev/archive/category/TextMeshPro)
 
 # 使い方
-
 ## インポート
-Package Manager の```Add package from git URL```に下記のURLを入力してください。
+Package Manager から```Localization, TextMeshPro, UniTask```をインポートしてください。
+
+それから Package Manager の```Add package from git URL```に下記のURLを入力してください。
 ```
 https://github.com/yamara-mh/TMPro_LocaleFontLoader.git?path=Assets/TMPro_LocaleFontLoader
 ```
