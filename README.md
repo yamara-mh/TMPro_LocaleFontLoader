@@ -65,5 +65,5 @@ WegGL のようにメモリの節約が重要なケースでは、Adobeの文字
 |項目|説明|
 |-|-|
 |ScopeMode|フォントの読み込み、破棄のタイミングを決める設定です。<br>Instance : このコンポーネントの Start() と OnDestroy() のタイミングで読込、破棄が行われます。<br>Active : このコンポーネントの OnEnable() と OnDisable() のタイミングで読込、破棄が行われます。<br>Manual : 手動で関数を呼んで読込、破棄を行います。|
-|UpdateAllTextOnLoaded|bool|Fallback の読み込み完了時にシーン上の TextMeshPro を取得し、BaseFont が使われていたら ForceMeshUpdate() します。|
+|UpdateAllTextOnLoaded|Fallback の読み込み完了時にシーン上の TextMeshPro を取得し、BaseFont が使われていたら ForceMeshUpdate() します。|
 |FontLoaders|対象となる LocaleFontLoader を設定します。|
