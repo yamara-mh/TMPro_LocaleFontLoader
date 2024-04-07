@@ -12,7 +12,7 @@
 ## インポート
 Package Manager の```Add package from git URL```に下記のURLを入力してください。
 ```
-https://github.com/yamara-mh/TMPro_LocaleFontLoader/tree/feature.git?path=Assets/TMPro_LocaleFontLoader
+https://github.com/yamara-mh/TMPro_LocaleFontLoader.git?path=Assets/TMPro_LocaleFontLoader
 ```
 
 また Dynamic な TMPro フォントはテクスチャが勝手に書き変わるため Git と相性が悪いです。
